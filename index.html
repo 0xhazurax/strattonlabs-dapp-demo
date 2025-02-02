@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Stratton Labs - Main</title>
   <style>
     /* Reset + basic styling */
@@ -66,7 +66,7 @@
     /* Main container */
     main {
       flex: 1;
-      max-width: 1200px; /* Wider layout */
+      max-width: 1200px;
       margin: 2rem auto;
       padding: 1rem;
     }
@@ -153,7 +153,7 @@
       background-color: #1E5780;
     }
 
-    /* Launched Tokens Grid */
+    /* Token grid (Launched Tokens) */
     h2 {
       color: #fff;
       margin-bottom: 1rem;
@@ -161,21 +161,15 @@
     }
     .token-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr); /* EXACTLY 3 columns */
+      grid-template-columns: repeat(3, 1fr); /* EXACTLY 3 columns on wide screens */
       gap: 1.5rem;
     }
-    /* Responsive adjustments */
     @media (max-width: 992px) {
-      .token-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+      .token-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 600px) {
-      .token-grid {
-        grid-template-columns: 1fr;
-      }
+      .token-grid { grid-template-columns: 1fr; }
     }
-    /* Each token card */
     .grid-token-card {
       background: #222;
       border: 2px solid #444;
@@ -229,7 +223,7 @@
     .grid-progress-fill {
       background-color: #6ed0f6;
       height: 100%;
-      width: 50%;
+      width: 50%; /* placeholder fill */
     }
     .grid-social-links {
       display: flex;
@@ -270,14 +264,14 @@
 </header>
 
 <main>
-  <!-- Hero-like Section -->
+  <!-- Hero-like section -->
   <section class="hero-section">
     <h1 class="hero-title">Stratton Labs</h1>
     <p class="hero-subtitle">The Howling Ground of Meme Fair Launch platform on SUI</p>
     <h3 class="hero-king">King of the wolves</h3>
   </section>
 
-  <!-- Search + Tabs Section -->
+  <!-- Search + Tabs -->
   <div class="search-section">
     <div class="search-box">
       <input type="text" class="search-input" placeholder="Search for token" id="searchInput" />
@@ -294,7 +288,7 @@
   <!-- Launched Tokens Grid -->
   <h2>Launched Tokens</h2>
   <div class="token-grid" id="launchedTokensGrid">
-    <!-- Tokens will be dynamically inserted here from localStorage -->
+    <!-- Dynamically filled from localStorage (myTokens) -->
   </div>
 </main>
 
@@ -303,24 +297,37 @@
 </footer>
 
 <script>
-  // Sui Wallet Connection Script
+  // ======================
+  //  SUI WALLET STANDARD 
+  // ======================
   document.getElementById('connectWalletBtn').addEventListener('click', async () => {
-    if (window.sui) {
-      try {
-        // Request the wallet to connect
-        const res = await window.sui.request({ method: 'sui_connect' });
-        console.log("Wallet connected:", res);
-        alert("Wallet connected!");
-      } catch (error) {
-        console.error("Connection failed:", error);
-        alert("Failed to connect wallet.");
+    try {
+      // 1) Check if the global window.wallets array exists
+      if (!window.wallets || window.wallets.length === 0) {
+        alert("No Sui wallet found implementing the Wallet Standard. Please install a compatible wallet.");
+        return;
       }
-    } else {
-      alert("Sui Wallet not detected. Please install a Sui wallet extension.");
+      // 2) Choose the first wallet (for demonstration)
+      const chosenWallet = window.wallets[0];
+
+      // 3) Check if the wallet has the "standard:connect" feature
+      const standardConnect = chosenWallet.features["standard:connect"];
+      if (!standardConnect) {
+        alert("This wallet does not support 'standard:connect' feature.");
+        return;
+      }
+
+      // 4) Attempt to connect
+      const connectResult = await standardConnect.connect();
+      console.log("Wallet connected:", connectResult);
+      alert("Wallet connected!\n" + JSON.stringify(connectResult, null, 2));
+    } catch (error) {
+      console.error("Connection failed:", error);
+      alert("Failed to connect wallet: " + error.message);
     }
   });
 
-  // Simple placeholders for the search & tab functionality
+  // Simple placeholders for search & tabs
   document.getElementById('searchBtn').addEventListener('click', () => {
     const query = document.getElementById('searchInput').value;
     alert('Searching for: ' + query);
@@ -342,17 +349,19 @@
   document.addEventListener('DOMContentLoaded', () => {
     const tokensGrid = document.getElementById('launchedTokensGrid');
     const storedTokens = JSON.parse(localStorage.getItem('myTokens')) || [];
-
-    // Clear any existing tokens
     tokensGrid.innerHTML = '';
 
-    // Create a card for each token
+    // Create a card for each stored token
     storedTokens.forEach((token) => {
       const card = document.createElement('div');
       card.classList.add('grid-token-card');
       card.innerHTML = `
         <div class="grid-token-header">
-          <img src="${token.logo}" alt="${token.ticker}" class="grid-token-img" />
+          <img 
+            src="${token.logo}" 
+            alt="${token.ticker}" 
+            class="grid-token-img"
+          />
           <div>
             <div class="grid-token-name">${token.name} (${token.ticker})</div>
             <div class="grid-token-subtitle">Created by: ???</div>
@@ -365,14 +374,27 @@
           <div class="grid-progress-fill" style="width: 30%;"></div>
         </div>
         <div class="grid-social-links">
-          <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram" class="grid-social-icon"
-            style="display:${token.telegramUrl ? 'inline-block' : 'none'};" />
-          <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter" class="grid-social-icon"
-            style="display:${token.twitterUrl ? 'inline-block' : 'none'};" />
-          <img src="https://cdn-icons-png.flaticon.com/512/84/84042.png" alt="Website" class="grid-social-icon"
-            style="display:${token.websiteUrl ? 'inline-block' : 'none'};" />
+          <img 
+            src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" 
+            alt="Telegram" 
+            class="grid-social-icon"
+            style="display:${token.telegramUrl ? 'inline-block' : 'none'};"
+          />
+          <img 
+            src="https://cdn-icons-png.flaticon.com/512/733/733579.png" 
+            alt="Twitter" 
+            class="grid-social-icon"
+            style="display:${token.twitterUrl ? 'inline-block' : 'none'};"
+          />
+          <img 
+            src="https://cdn-icons-png.flaticon.com/512/84/84042.png"
+            alt="Website"
+            class="grid-social-icon"
+            style="display:${token.websiteUrl ? 'inline-block' : 'none'};"
+          />
         </div>
       `;
+      // Clicking a card => go to token-page.html with params
       card.addEventListener('click', () => {
         const queryParams = new URLSearchParams({
           tokenLogo: token.logo,
