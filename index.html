@@ -66,7 +66,7 @@
     /* Main container */
     main {
       flex: 1;
-      max-width: 1200px;
+      max-width: 1200px; /* Wider layout for 3 columns */
       margin: 2rem auto;
       padding: 1rem;
     }
@@ -153,7 +153,7 @@
       background-color: #1E5780;
     }
 
-    /* Token grid (Launched Tokens) */
+    /* Launched Tokens Grid (3 columns) */
     h2 {
       color: #fff;
       margin-bottom: 1rem;
@@ -164,12 +164,19 @@
       grid-template-columns: repeat(3, 1fr); /* EXACTLY 3 columns on wide screens */
       gap: 1.5rem;
     }
+    /* Make it responsive: 2 columns if below 992px, 1 column if below 600px */
     @media (max-width: 992px) {
-      .token-grid { grid-template-columns: repeat(2, 1fr); }
+      .token-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
     @media (max-width: 600px) {
-      .token-grid { grid-template-columns: 1fr; }
+      .token-grid {
+        grid-template-columns: 1fr;
+      }
     }
+
+    /* Each token card */
     .grid-token-card {
       background: #222;
       border: 2px solid #444;
@@ -297,37 +304,72 @@
 </footer>
 
 <script>
-  // ======================
-  //  SUI WALLET STANDARD 
-  // ======================
+  // 1) Combined Wallet Fallback Approach
   document.getElementById('connectWalletBtn').addEventListener('click', async () => {
     try {
-      // 1) Check if the global window.wallets array exists
-      if (!window.wallets || window.wallets.length === 0) {
-        alert("No Sui wallet found implementing the Wallet Standard. Please install a compatible wallet.");
-        return;
+      //
+      // Try Wallet Standard (window.wallets)
+      //
+      if (window.wallets && window.wallets.length > 0) {
+        const chosenWallet = window.wallets[0];
+        const connectFeature = chosenWallet.features["standard:connect"];
+        if (connectFeature) {
+          // Attempt connect via standard
+          const connectResult = await connectFeature.connect();
+          console.log("Wallet connected (standard):", connectResult);
+          alert("Wallet connected (standard)!");
+          return;
+        } else {
+          alert("This wallet doesn't implement 'standard:connect'. Trying fallback...");
+        }
       }
-      // 2) Choose the first wallet (for demonstration)
-      const chosenWallet = window.wallets[0];
 
-      // 3) Check if the wallet has the "standard:connect" feature
-      const standardConnect = chosenWallet.features["standard:connect"];
-      if (!standardConnect) {
-        alert("This wallet does not support 'standard:connect' feature.");
-        return;
+      //
+      // Try legacy window.sui
+      //
+      if (window.sui) {
+        try {
+          const response = await window.sui.request({ method: 'sui_connect' });
+          console.log("Wallet connected (window.sui):", response);
+          alert("Wallet connected via legacy window.sui!");
+          return;
+        } catch (err) {
+          console.error("Legacy sui_connect failed:", err);
+        }
       }
 
-      // 4) Attempt to connect
-      const connectResult = await standardConnect.connect();
-      console.log("Wallet connected:", connectResult);
-      alert("Wallet connected!\n" + JSON.stringify(connectResult, null, 2));
+      //
+      // Try window.mystenWallet
+      //
+      if (window.mystenWallet) {
+        try {
+          // Some versions might have .connect() or .request({ method: 'sui_connect' })
+          if (typeof window.mystenWallet.connect === 'function') {
+            const resp = await window.mystenWallet.connect();
+            console.log("Connected via mystenWallet.connect():", resp);
+            alert("Wallet connected via mystenWallet!");
+            return;
+          } else {
+            // fallback: request method
+            const resp = await window.mystenWallet.request({ method: 'sui_connect' });
+            console.log("Connected via mystenWallet.request:", resp);
+            alert("Wallet connected via mystenWallet!");
+            return;
+          }
+        } catch (err) {
+          console.error("mystenWallet connect failed:", err);
+        }
+      }
+
+      // If we get here, none of the standard or legacy objects found
+      alert("No recognized Sui wallet found. Please install or enable a supported wallet extension.");
     } catch (error) {
       console.error("Connection failed:", error);
       alert("Failed to connect wallet: " + error.message);
     }
   });
 
-  // Simple placeholders for search & tabs
+  // 2) Simple placeholders for search & tab logic
   document.getElementById('searchBtn').addEventListener('click', () => {
     const query = document.getElementById('searchInput').value;
     alert('Searching for: ' + query);
@@ -345,13 +387,13 @@
     alert('Showing latest tokens...');
   });
 
-  // On page load, read stored tokens from localStorage & display them
+  // 3) On page load, read stored tokens from localStorage & display them
   document.addEventListener('DOMContentLoaded', () => {
     const tokensGrid = document.getElementById('launchedTokensGrid');
     const storedTokens = JSON.parse(localStorage.getItem('myTokens')) || [];
     tokensGrid.innerHTML = '';
 
-    // Create a card for each stored token
+    // For each token, create a card
     storedTokens.forEach((token) => {
       const card = document.createElement('div');
       card.classList.add('grid-token-card');
@@ -381,7 +423,7 @@
             style="display:${token.telegramUrl ? 'inline-block' : 'none'};"
           />
           <img 
-            src="https://cdn-icons-png.flaticon.com/512/733/733579.png" 
+            src="https://cdn-icons-png.flaticon.com/512/733/733579.png"
             alt="Twitter" 
             class="grid-social-icon"
             style="display:${token.twitterUrl ? 'inline-block' : 'none'};"
@@ -394,7 +436,8 @@
           />
         </div>
       `;
-      // Clicking a card => go to token-page.html with params
+
+      // Click => go to token-page.html
       card.addEventListener('click', () => {
         const queryParams = new URLSearchParams({
           tokenLogo: token.logo,
