@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stratton Labs - Token Page</title>
+  <style>
+    /* Basic Reset & Dark Theme */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #181A1B;
+      color: #ddd;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* Header */
+    header {
+      background: #111;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+    }
+    .header-left h1 {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 0;
+    }
+    .back-btn {
+      background-color: #444;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      font-size: 0.9rem;
+    }
+    .back-btn:hover { background-color: #666; }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem 2rem;
+      gap: 1.5rem;
+    }
+
+    /* Token Info Row */
+    .token-info-row {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .token-info-row .token-title {
+      font-size: 1.3rem;
+      color: #fff;
+    }
+    .token-info-row .extra-info {
+      font-size: 0.85rem;
+      color: #aaa;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .marketcap { color: #8bc34a; }
+
+    /* Content: chart + trades + buy/sell columns */
+    .content-row {
+      display: flex;
+      gap: 1.5rem;
+      flex: 1;
+    }
+    .chart-column {
+      flex: 2;
+      background: #222;
+      border: 1px solid #333;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+    }
+    .chart-placeholder {
+      flex: 1;
+      background: #333;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+    .trades-section {
+      background: #2a2c2d;
+      border: 1px solid #444;
+      border-radius: 4px;
+      padding: 0.75rem;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 0.85rem;
+    }
+    .trades-section .thread-header {
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      color: #bbb;
+    }
+    .trade-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.3rem;
+    }
+    .trade-row .address { color: #8bc34a; }
+    .trade-row .action-buy { color: #4caf50; }
+    .trade-row .action-sell { color: #f44336; }
+    .trade-row .amount { color: #ccc; }
+
+    /* Right Column: buy/sell + token details */
+    .buy-sell-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .trade-panel {
+      background: #222;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .trade-panel .tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .trade-panel .tabs button {
+      flex: 1;
+      background: #444;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem;
+      cursor: pointer;
+    }
+    .trade-panel .tabs button:hover { background: #666; }
+    .active-tab { background: #388e3c; }
+    .small-btn {
+      margin-bottom: 0.5rem;
+      background: #444;
+      color: #fff;
+      border-radius: 4px;
+      border: none;
+      padding: 0.3rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .input-group { margin-bottom: 1rem; }
+    .input-group label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 0.3rem;
+      color: #bbb;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 0.5rem;
+      background: #333;
+      color: #ddd;
+      border: 1px solid #444;
+      border-radius: 4px;
+    }
+    .input-group input:focus { outline: none; border-color: #69a6f9; }
+    .place-trade {
+      background: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0.75rem;
+      cursor: pointer;
+      width: 100%;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+    .place-trade:hover { background: #388e3c; }
+
+    /* Token details panel (bonding, King of the Wolves, etc.) */
+    .token-details-panel {
+      background: #222;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 1rem;
+    }
+    .details-line {
+      font-size: 0.85rem;
+      margin-bottom: 0.75rem;
+      color: #bbb;
+    }
+    .progress-bar-sm {
+      background: #333;
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+    .progress-fill-sm {
+      background-color: #6ed0f6;
+      height: 100%;
+      width: 5%;
+    }
+    .token-desc {
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: #999;
+    }
+    .small-button-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .small-btn-2 {
+      flex: 1;
+      background: #444;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .small-btn-2:hover { background: #666; }
+    .holder-dist {
+      margin-top: 0.75rem;
+      font-size: 0.85rem;
+      color: #ccc;
+    }
+    .dist-list li { margin-bottom: 0.25rem; }
+
+    /* Additional styling for the token logo in the buy panel */
+    .buy-panel-header {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .buy-panel-header img {
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      object-fit: cover;
+    }
+
+    /* Footer */
+    footer {
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <a href="index.html" style="text-decoration:none; color:white;">
+      <h1>Stratton Labs</h1>
+    </a>
+  </div>
+  <button class="back-btn" onclick="window.location.href='index.html';">[go back]</button>
+</header>
+
+<main>
+  <!-- Top bar for token info from create-token page -->
+  <div class="token-info-row">
+    <div class="token-title" id="dynamicTokenName">Example Token (EXMPL)</div>
+    <span class="extra-info">
+      <span id="extraTag">xXx9</span>
+      | about 10 minutes ago
+      | <span class="marketcap">market cap: $9,999</span>
+      | replies: 42
+    </span>
+  </div>
+
+  <!-- Middle row: chart column + buy/sell column -->
+  <div class="content-row">
+    <!-- Left: Chart & trades -->
+    <div class="chart-column">
+      <div class="chart-placeholder">
+        [Chart area: TradingView or similar goes here]
+      </div>
+      <div class="trades-section">
+        <div class="thread-header">
+          thread | trades
+          <br><small>filter by size <input type="checkbox" checked> 0.05 (44 trades > 0.05 Sui)</small>
+        </div>
+        <div class="trade-row">
+          <span class="address">6JnPvS</span>
+          <span class="action-buy">buy</span>
+          <span class="amount">1.000</span>
+          <span>29m ago</span>
+        </div>
+        <div class="trade-row">
+          <span class="address">7J19bE</span>
+          <span class="action-sell">sell</span>
+          <span class="amount">0.116</span>
+          <span>32m ago</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Buy panel + token details -->
+    <div class="buy-sell-column">
+      <div class="trade-panel">
+        <div class="buy-panel-header" id="buyPanelHeader">
+          <img src="https://via.placeholder.com/64" alt="Token Logo" id="buyPanelLogo">
+          <div>
+            <strong id="buyPanelName">Example Token (EXMPL)</strong>
+          </div>
+        </div>
+        <div class="tabs">
+          <button class="active-tab">buy</button>
+          <button>sell</button>
+        </div>
+        <button class="small-btn">set max slippage</button>
+        <div class="input-group">
+          <label>amount (Sui)</label>
+          <input type="number" placeholder="0.00" />
+        </div>
+        <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+          <button class="small-btn">1 Sui</button>
+          <button class="small-btn">5 Sui</button>
+          <button class="small-btn">10 Sui</button>
+        </div>
+        <button class="place-trade">place trade</button>
+        <div class="token-desc" id="descPlaceholder">
+          A sample description for your new token.
+        </div>
+      </div>
+      <div class="token-details-panel">
+        <div class="details-line">
+          <strong>bonding curve progress: 100%</strong>
+          <div class="progress-bar-sm">
+            <div class="progress-fill-sm" style="width:100%;"></div>
+          </div>
+          (For example) This coin is fully funded at $100k market cap.
+        </div>
+        <div class="details-line">
+          <strong>King of the Wolves progress: 100%</strong>
+          <div class="progress-bar-sm">
+            <div class="progress-fill-sm" style="width:100%; background:#ffca28;"></div>
+          </div>
+          <small>crowned the current wolf on 2/2/2025, 8:52:28 PM</small>
+        </div>
+        <div class="small-button-row">
+          <button class="small-btn-2" id="twitterBtn">twitter</button>
+          <button class="small-btn-2" id="telegramBtn">telegram</button>
+          <button class="small-btn-2" id="websiteBtn">website</button>
+        </div>
+        <p style="font-size:0.8rem; margin:0.5rem 0;">
+          contract address: <span id="contractAddr">7q43y...pump</span>
+        </p>
+        <hr style="border:none; border-bottom:1px solid #444; margin:0.5rem 0;"/>
+        <div class="holder-dist">
+          <p>holder distribution</p>
+          <button style="background:#444; color:#fff; border:none; border-radius:4px; padding:0.3rem;">generate bubble map</button>
+          <ul class="dist-list" style="margin-top:0.5rem; list-style:none; padding-left:0;">
+            <li>1. Wolf1 (bonding curve): 96.35%</li>
+            <li>2. Wolf2: 3.44%</li>
+            <li>3. Wolf3: 0.19%</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>&copy; 2025 Stratton Labs. All rights reserved.</p>
+</footer>
+
+<script>
+  // On page load, parse query params from create-token.html
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const tokenLogo = params.get('tokenLogo');       // base64 or URL
+    const tokenName = params.get('tokenName') || 'Untitled Token';
+    const tokenTicker = params.get('tokenTicker') || '???';
+    const tokenDescription = params.get('tokenDescription') || '';
+    const websiteUrl = params.get('websiteUrl') || '';
+    const telegramUrl = params.get('telegramUrl') || '';
+    const twitterUrl = params.get('twitterUrl') || '';
+    
+    // Update top row token name
+    document.querySelector('.token-title').textContent = `${tokenName} (${tokenTicker})`;
+    // Update buy panel header
+    document.getElementById('buyPanelName').textContent = `${tokenName} (${tokenTicker})`;
+    // If tokenLogo exists, update the buy panel logo
+    if (tokenLogo) {
+      document.getElementById('buyPanelLogo').src = tokenLogo;
+    }
+    // Update token description
+    if (tokenDescription) {
+      document.getElementById('descPlaceholder').textContent = tokenDescription;
+    }
+    // Dynamically set link buttons if URLs provided
+    if (twitterUrl) {
+      document.getElementById('twitterBtn').onclick = () => {
+        window.open(twitterUrl, '_blank');
+      };
+    }
+    if (telegramUrl) {
+      document.getElementById('telegramBtn').onclick = () => {
+        window.open(telegramUrl, '_blank');
+      };
+    }
+    if (websiteUrl) {
+      document.getElementById('websiteBtn').onclick = () => {
+        window.open(websiteUrl, '_blank');
+      };
+    }
+  });
+</script>
+</body>
+</html>

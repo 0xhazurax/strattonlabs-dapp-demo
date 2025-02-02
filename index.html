@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stratton Labs - Main</title>
+  <style>
+    /* Reset + basic styling */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #181A1B; /* Dark background */
+      color: #ddd;              /* Lighter text */
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      background-color: #111;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+    }
+    .logo {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+    .header-center {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+    }
+    .nav-btn {
+      color: #ccc;
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 0.25rem 0.5rem;
+      transition: color 0.2s;
+    }
+    .nav-btn:hover {
+      color: #fff;
+    }
+    .connect-wallet-btn {
+      background-color: #444;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .connect-wallet-btn:hover {
+      background-color: #666;
+    }
+
+    /* Main container */
+    main {
+      flex: 1;
+      max-width: 1200px; /* Wider layout */
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+
+    /* Hero Section */
+    .hero-section {
+      text-align: center;
+      margin-bottom: 2rem;
+      color: #fff;
+    }
+    .hero-title {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .hero-subtitle {
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      color: #bbb;
+    }
+    .hero-king {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #65c3ba;
+      text-shadow: 1px 1px 4px rgba(0,0,0,0.3);
+      margin-bottom: 2rem;
+    }
+
+    /* Search & Tabs Section */
+    .search-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .search-box {
+      position: relative;
+      width: 300px;
+      margin-bottom: 1rem;
+    }
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 2.5rem 0.75rem 1rem;
+      border: none;
+      border-radius: 9999px;
+      font-size: 0.95rem;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+    .search-input:focus {
+      outline: none;
+      border: 1px solid #69a6f9;
+    }
+    .search-btn {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #666;
+      font-size: 1.1rem;
+      cursor: pointer;
+    }
+    .search-btn:hover {
+      color: #aaa;
+    }
+    .tabs {
+      display: flex;
+      gap: 1rem;
+    }
+    .tab-btn {
+      background-color: #0F3E5C;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.2s;
+    }
+    .tab-btn:hover {
+      background-color: #14486b;
+    }
+    .tab-btn.active {
+      background-color: #1E5780;
+    }
+
+    /* Launched Tokens Grid */
+    h2 {
+      color: #fff;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr); /* EXACTLY 3 columns */
+      gap: 1.5rem;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+      .token-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      .token-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    /* Each token card */
+    .grid-token-card {
+      background: #222;
+      border: 2px solid #444;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 0 8px rgba(0,0,0,0.4);
+      cursor: pointer;
+      transition: transform 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .grid-token-card:hover {
+      transform: translateY(-2px);
+    }
+    .grid-token-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      justify-content: flex-start;
+      margin-bottom: 1rem;
+    }
+    .grid-token-img {
+      width: 50px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 2px solid #555;
+    }
+    .grid-token-name {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #fefefe;
+    }
+    .grid-token-subtitle {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin: 0.25rem 0;
+    }
+    .grid-token-detail {
+      font-size: 0.85rem;
+      color: #ddd;
+    }
+    .grid-progress-bar {
+      background: #333;
+      border-radius: 4px;
+      height: 8px;
+      overflow: hidden;
+      margin: 0.5rem 0;
+    }
+    .grid-progress-fill {
+      background-color: #6ed0f6;
+      height: 100%;
+      width: 50%;
+    }
+    .grid-social-links {
+      display: flex;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+    .grid-social-icon {
+      width: 20px;
+      height: 20px;
+      filter: brightness(0.8);
+      cursor: pointer;
+      transition: filter 0.2s;
+    }
+    .grid-social-icon:hover {
+      filter: brightness(1);
+    }
+
+    /* Footer */
+    footer {
+      background-color: #111;
+      color: #fff;
+      text-align: center;
+      padding: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Stratton Labs</div>
+  <div class="header-center">
+    <a href="#" class="nav-btn">SWAP</a>
+    <a href="#" class="nav-btn">BRIDGE</a>
+    <a href="create-token.html" class="nav-btn">CREATE TOKEN</a>
+    <a href="#" class="nav-btn">STAKING</a>
+  </div>
+  <button class="connect-wallet-btn" id="connectWalletBtn">Connect Wallet</button>
+</header>
+
+<main>
+  <!-- Hero-like Section -->
+  <section class="hero-section">
+    <h1 class="hero-title">Stratton Labs</h1>
+    <p class="hero-subtitle">The Howling Ground of Meme Fair Launch platform on SUI</p>
+    <h3 class="hero-king">King of the wolves</h3>
+  </section>
+
+  <!-- Search + Tabs Section -->
+  <div class="search-section">
+    <div class="search-box">
+      <input type="text" class="search-input" placeholder="Search for token" id="searchInput" />
+      <button class="search-btn" id="searchBtn">&#128269;</button>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" id="featuredTab">Featured</button>
+      <button class="tab-btn" id="volumeTab">Volume 24h</button>
+      <button class="tab-btn" id="marketCapTab">Market Cap</button>
+      <button class="tab-btn" id="latestTab">Latest</button>
+    </div>
+  </div>
+
+  <!-- Launched Tokens Grid -->
+  <h2>Launched Tokens</h2>
+  <div class="token-grid" id="launchedTokensGrid">
+    <!-- Tokens will be dynamically inserted here from localStorage -->
+  </div>
+</main>
+
+<footer>
+  <p>&copy; 2025 Stratton Labs. All rights reserved.</p>
+</footer>
+
+<script>
+  // Sui Wallet Connection Script
+  document.getElementById('connectWalletBtn').addEventListener('click', async () => {
+    if (window.sui) {
+      try {
+        // Request the wallet to connect
+        const res = await window.sui.request({ method: 'sui_connect' });
+        console.log("Wallet connected:", res);
+        alert("Wallet connected!");
+      } catch (error) {
+        console.error("Connection failed:", error);
+        alert("Failed to connect wallet.");
+      }
+    } else {
+      alert("Sui Wallet not detected. Please install a Sui wallet extension.");
+    }
+  });
+
+  // Simple placeholders for the search & tab functionality
+  document.getElementById('searchBtn').addEventListener('click', () => {
+    const query = document.getElementById('searchInput').value;
+    alert('Searching for: ' + query);
+  });
+  document.getElementById('featuredTab').addEventListener('click', () => {
+    alert('Showing featured tokens...');
+  });
+  document.getElementById('volumeTab').addEventListener('click', () => {
+    alert('Sorting tokens by Volume 24h...');
+  });
+  document.getElementById('marketCapTab').addEventListener('click', () => {
+    alert('Sorting tokens by Market Cap...');
+  });
+  document.getElementById('latestTab').addEventListener('click', () => {
+    alert('Showing latest tokens...');
+  });
+
+  // On page load, read stored tokens from localStorage & display them
+  document.addEventListener('DOMContentLoaded', () => {
+    const tokensGrid = document.getElementById('launchedTokensGrid');
+    const storedTokens = JSON.parse(localStorage.getItem('myTokens')) || [];
+
+    // Clear any existing tokens
+    tokensGrid.innerHTML = '';
+
+    // Create a card for each token
+    storedTokens.forEach((token) => {
+      const card = document.createElement('div');
+      card.classList.add('grid-token-card');
+      card.innerHTML = `
+        <div class="grid-token-header">
+          <img src="${token.logo}" alt="${token.ticker}" class="grid-token-img" />
+          <div>
+            <div class="grid-token-name">${token.name} (${token.ticker})</div>
+            <div class="grid-token-subtitle">Created by: ???</div>
+          </div>
+        </div>
+        <div class="grid-token-detail">
+          ${token.description.substring(0,50)}...
+        </div>
+        <div class="grid-progress-bar">
+          <div class="grid-progress-fill" style="width: 30%;"></div>
+        </div>
+        <div class="grid-social-links">
+          <img src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" alt="Telegram" class="grid-social-icon"
+            style="display:${token.telegramUrl ? 'inline-block' : 'none'};" />
+          <img src="https://cdn-icons-png.flaticon.com/512/733/733579.png" alt="Twitter" class="grid-social-icon"
+            style="display:${token.twitterUrl ? 'inline-block' : 'none'};" />
+          <img src="https://cdn-icons-png.flaticon.com/512/84/84042.png" alt="Website" class="grid-social-icon"
+            style="display:${token.websiteUrl ? 'inline-block' : 'none'};" />
+        </div>
+      `;
+      card.addEventListener('click', () => {
+        const queryParams = new URLSearchParams({
+          tokenLogo: token.logo,
+          tokenName: token.name,
+          tokenTicker: token.ticker,
+          tokenDescription: token.description,
+          websiteUrl: token.websiteUrl,
+          telegramUrl: token.telegramUrl,
+          twitterUrl: token.twitterUrl
+        });
+        window.location.href = `token-page.html?${queryParams.toString()}`;
+      });
+      tokensGrid.appendChild(card);
+    });
+  });
+</script>
+</body>
+</html>
