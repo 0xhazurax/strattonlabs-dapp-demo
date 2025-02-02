@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Stratton Labs - Create Token</title>
   <style>
     /* Reset & Basic Styling */
@@ -176,7 +176,7 @@
 
 <header>
   <div class="header-title">Stratton Labs - Create Token</div>
-  <!-- Connect Wallet Button using Sui Wallet Standard -->
+  <!-- Connect Wallet Button (optional) -->
   <button class="connect-wallet-btn" id="connectWalletBtn">Connect Wallet</button>
 </header>
 
@@ -185,9 +185,9 @@
   <h1>Create Your Token</h1>
 
   <form id="createTokenForm">
-    <!-- 1) Token Logo (image upload) -->
+    <!-- 1) Token Logo (image upload) with size limit: 1MB -->
     <div class="form-group">
-      <label for="tokenLogo">Token Logo (image upload)</label>
+      <label for="tokenLogo">Token Logo (image upload, max 1MB)</label>
       <input 
         type="file" 
         id="tokenLogo" 
@@ -235,9 +235,7 @@
 
     <!-- 5) Optional Website URL -->
     <div class="form-group">
-      <label for="websiteUrl">
-        Website URL <span class="optional-label">(optional)</span>
-      </label>
+      <label for="websiteUrl">Website URL <span class="optional-label">(optional)</span></label>
       <input 
         type="text" 
         id="websiteUrl" 
@@ -248,9 +246,7 @@
 
     <!-- 6) Optional Telegram URL -->
     <div class="form-group">
-      <label for="telegramUrl">
-        Telegram URL <span class="optional-label">(optional)</span>
-      </label>
+      <label for="telegramUrl">Telegram URL <span class="optional-label">(optional)</span></label>
       <input 
         type="text" 
         id="telegramUrl" 
@@ -261,9 +257,7 @@
 
     <!-- 7) Optional Twitter URL -->
     <div class="form-group">
-      <label for="twitterUrl">
-        Twitter URL <span class="optional-label">(optional)</span>
-      </label>
+      <label for="twitterUrl">Twitter URL <span class="optional-label">(optional)</span></label>
       <input 
         type="text" 
         id="twitterUrl" 
@@ -278,9 +272,7 @@
 
   <div class="note">
     <p>
-      Note: This example converts the uploaded image to Base64. For production,
-      consider uploading to IPFS or a server.  
-      If any required fields are empty, you cannot proceed.
+      Max file size is 1MB. If any required fields are empty, you cannot proceed.
     </p>
   </div>
 </div>
@@ -290,39 +282,15 @@
 </footer>
 
 <script>
-  // ======================
-  //  SUI WALLET STANDARD 
-  // ======================
+  // ================
+  // Sui Wallet Standard fallback approach (Optional)
+  // ================
   document.getElementById('connectWalletBtn').addEventListener('click', async () => {
-    try {
-      // 1) Check if the global window.wallets array exists
-      if (!window.wallets || window.wallets.length === 0) {
-        alert("No Sui wallet found implementing the Wallet Standard. Please install a compatible wallet.");
-        return;
-      }
-      // 2) Choose the first wallet (for demonstration)
-      const chosenWallet = window.wallets[0];
-
-      // 3) Check if the wallet has the "standard:connect" feature
-      const standardConnect = chosenWallet.features["standard:connect"];
-      if (!standardConnect) {
-        alert("This wallet does not support 'standard:connect' feature.");
-        return;
-      }
-
-      // 4) Attempt to connect
-      const connectResult = await standardConnect.connect();
-      console.log("Wallet connected:", connectResult);
-      alert("Wallet connected!\n" + JSON.stringify(connectResult, null, 2));
-    } catch (error) {
-      console.error("Connection failed:", error);
-      alert("Failed to connect wallet: " + error.message);
-    }
+    alert("Connect logic here (if you want).");
   });
 
-
   // ================
-  // CREATE TOKEN LOGIC
+  //  IMAGE UPLOAD WITH SIZE LIMIT
   // ================
   let tokenLogoBase64 = "";
   const fileInput = document.getElementById("tokenLogo");
@@ -332,6 +300,17 @@
     const file = event.target.files[0];
     if (!file) return;
 
+    // Check file size (max 1MB = 1,024,000 bytes)
+    if (file.size > 1024 * 1024) {
+      alert("File size exceeds 1MB limit. Please choose a smaller image.");
+      // reset file input
+      fileInput.value = "";
+      // reset preview
+      previewImg.src = "https://via.placeholder.com/100";
+      tokenLogoBase64 = "";
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = function(e) {
       tokenLogoBase64 = e.target.result; 
@@ -340,6 +319,9 @@
     reader.readAsDataURL(file);
   });
 
+  // ================
+  //  FORM SUBMISSION
+  // ================
   const form = document.getElementById('createTokenForm');
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -349,14 +331,15 @@
     const tokenDescription = document.getElementById('tokenDescription').value.trim();
 
     if (!tokenName || !tokenTicker || !tokenDescription || !tokenLogoBase64) {
-      alert("Please fill out all required fields.");
+      alert("Please fill out all required fields and upload a valid image.");
       return;
     }
+
     const websiteUrl = document.getElementById('websiteUrl').value.trim();
     const telegramUrl = document.getElementById('telegramUrl').value.trim();
     const twitterUrl = document.getElementById('twitterUrl').value.trim();
 
-    // 1) Store in localStorage so index can display it
+    // Build the new token object
     const newToken = {
       logo: tokenLogoBase64,
       name: tokenName,
@@ -367,23 +350,14 @@
       twitterUrl
     };
 
-    const existingTokens = JSON.parse(localStorage.getItem('myTokens')) || [];
-    existingTokens.push(newToken);
-    localStorage.setItem('myTokens', JSON.stringify(existingTokens));
+    // 1) Generate an ID for localStorage
+    const tokenId = Date.now().toString(); // or crypto.randomUUID()
 
-    // 2) Build query params for token-page display
-    const queryParams = new URLSearchParams({
-      tokenLogo: tokenLogoBase64,
-      tokenName,
-      tokenTicker,
-      tokenDescription,
-      websiteUrl,
-      telegramUrl,
-      twitterUrl
-    });
+    // 2) Store the data in localStorage so the token-page can load it
+    localStorage.setItem(`token_${tokenId}`, JSON.stringify(newToken));
 
-    // 3) Redirect to token-page.html
-    window.location.href = `token-page.html?${queryParams.toString()}`;
+    // 3) Redirect to token-page.html with just the ID
+    window.location.href = `token-page.html?id=${tokenId}`;
   });
 </script>
 
