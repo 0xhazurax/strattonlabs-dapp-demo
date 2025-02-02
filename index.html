@@ -66,7 +66,7 @@
     /* Main container */
     main {
       flex: 1;
-      max-width: 1200px; /* Wider layout for 3 columns */
+      max-width: 1200px; 
       margin: 2rem auto;
       padding: 1rem;
     }
@@ -161,10 +161,9 @@
     }
     .token-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr); /* EXACTLY 3 columns on wide screens */
+      grid-template-columns: repeat(3, 1fr); 
       gap: 1.5rem;
     }
-    /* Make it responsive: 2 columns if below 992px, 1 column if below 600px */
     @media (max-width: 992px) {
       .token-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -175,8 +174,6 @@
         grid-template-columns: 1fr;
       }
     }
-
-    /* Each token card */
     .grid-token-card {
       background: #222;
       border: 2px solid #444;
@@ -230,7 +227,7 @@
     .grid-progress-fill {
       background-color: #6ed0f6;
       height: 100%;
-      width: 50%; /* placeholder fill */
+      width: 50%; 
     }
     .grid-social-links {
       display: flex;
@@ -295,7 +292,7 @@
   <!-- Launched Tokens Grid -->
   <h2>Launched Tokens</h2>
   <div class="token-grid" id="launchedTokensGrid">
-    <!-- Dynamically filled from localStorage (myTokens) -->
+    <!-- Dynamically filled from localStorage -->
   </div>
 </main>
 
@@ -304,56 +301,50 @@
 </footer>
 
 <script>
-  // 1) Combined Wallet Fallback Approach
+  // ================
+  //  CONNECT WALLET
+  // ================
   document.getElementById('connectWalletBtn').addEventListener('click', async () => {
     try {
-      //
-      // Try Wallet Standard (window.wallets)
-      //
+      // 1) Try Sui Wallet Standard (window.wallets)
       if (window.wallets && window.wallets.length > 0) {
         const chosenWallet = window.wallets[0];
         const connectFeature = chosenWallet.features["standard:connect"];
         if (connectFeature) {
-          // Attempt connect via standard
           const connectResult = await connectFeature.connect();
-          console.log("Wallet connected (standard):", connectResult);
-          alert("Wallet connected (standard)!");
+          console.log("Wallet connected (standard)", connectResult);
+          alert("Wallet connected via standard!\n" + JSON.stringify(connectResult, null, 2));
           return;
         } else {
           alert("This wallet doesn't implement 'standard:connect'. Trying fallback...");
         }
       }
 
-      //
-      // Try legacy window.sui
-      //
+      // 2) Try legacy window.sui
       if (window.sui) {
         try {
           const response = await window.sui.request({ method: 'sui_connect' });
           console.log("Wallet connected (window.sui):", response);
-          alert("Wallet connected via legacy window.sui!");
+          alert("Wallet connected via legacy window.sui!\n" + JSON.stringify(response, null, 2));
           return;
         } catch (err) {
           console.error("Legacy sui_connect failed:", err);
         }
       }
 
-      //
-      // Try window.mystenWallet
-      //
+      // 3) Try window.mystenWallet
       if (window.mystenWallet) {
         try {
-          // Some versions might have .connect() or .request({ method: 'sui_connect' })
           if (typeof window.mystenWallet.connect === 'function') {
             const resp = await window.mystenWallet.connect();
             console.log("Connected via mystenWallet.connect():", resp);
-            alert("Wallet connected via mystenWallet!");
+            alert("Wallet connected via mystenWallet!\n" + JSON.stringify(resp, null, 2));
             return;
           } else {
-            // fallback: request method
+            // fallback: .request({ method: 'sui_connect' })
             const resp = await window.mystenWallet.request({ method: 'sui_connect' });
             console.log("Connected via mystenWallet.request:", resp);
-            alert("Wallet connected via mystenWallet!");
+            alert("Wallet connected via mystenWallet!\n" + JSON.stringify(resp, null, 2));
             return;
           }
         } catch (err) {
@@ -361,7 +352,27 @@
         }
       }
 
-      // If we get here, none of the standard or legacy objects found
+      // 4) Try window.suiWallet (some forks might define this)
+      if (window.suiWallet) {
+        try {
+          // Possibly .connect() or .request()
+          if (typeof window.suiWallet.connect === 'function') {
+            const resp = await window.suiWallet.connect();
+            console.log("Connected via suiWallet.connect():", resp);
+            alert("Wallet connected via suiWallet!\n" + JSON.stringify(resp, null, 2));
+            return;
+          } else {
+            const resp = await window.suiWallet.request({ method: 'sui_connect' });
+            console.log("Connected via suiWallet.request:", resp);
+            alert("Wallet connected via suiWallet!\n" + JSON.stringify(resp, null, 2));
+            return;
+          }
+        } catch (err) {
+          console.error("suiWallet connect failed:", err);
+        }
+      }
+
+      // If we got here, no recognized Sui wallet object was found
       alert("No recognized Sui wallet found. Please install or enable a supported wallet extension.");
     } catch (error) {
       console.error("Connection failed:", error);
@@ -369,7 +380,9 @@
     }
   });
 
-  // 2) Simple placeholders for search & tab logic
+  // ==============
+  //  SEARCH & TABS
+  // ==============
   document.getElementById('searchBtn').addEventListener('click', () => {
     const query = document.getElementById('searchInput').value;
     alert('Searching for: ' + query);
@@ -387,13 +400,14 @@
     alert('Showing latest tokens...');
   });
 
-  // 3) On page load, read stored tokens from localStorage & display them
+  // ==========================
+  //  LOAD TOKENS FROM STORAGE
+  // ==========================
   document.addEventListener('DOMContentLoaded', () => {
     const tokensGrid = document.getElementById('launchedTokensGrid');
     const storedTokens = JSON.parse(localStorage.getItem('myTokens')) || [];
     tokensGrid.innerHTML = '';
 
-    // For each token, create a card
     storedTokens.forEach((token) => {
       const card = document.createElement('div');
       card.classList.add('grid-token-card');
@@ -417,7 +431,7 @@
         </div>
         <div class="grid-social-links">
           <img 
-            src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png" 
+            src="https://cdn-icons-png.flaticon.com/512/2111/2111646.png"
             alt="Telegram" 
             class="grid-social-icon"
             style="display:${token.telegramUrl ? 'inline-block' : 'none'};"
@@ -430,14 +444,12 @@
           />
           <img 
             src="https://cdn-icons-png.flaticon.com/512/84/84042.png"
-            alt="Website"
+            alt="Website" 
             class="grid-social-icon"
             style="display:${token.websiteUrl ? 'inline-block' : 'none'};"
           />
         </div>
       `;
-
-      // Click => go to token-page.html
       card.addEventListener('click', () => {
         const queryParams = new URLSearchParams({
           tokenLogo: token.logo,
@@ -454,5 +466,6 @@
     });
   });
 </script>
+
 </body>
 </html>
