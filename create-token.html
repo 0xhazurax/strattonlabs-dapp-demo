@@ -2,11 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Stratton Labs - Create Token</title>
   <style>
     /* Reset & Basic Styling */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Arial', sans-serif;
       background: #181A1B; /* Dark background */
@@ -15,13 +19,39 @@
       display: flex;
       flex-direction: column;
     }
-    a { text-decoration: none; }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* HEADER */
     header {
       background-color: #111;
       color: #fff;
-      text-align: center;
-      padding: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
     }
+    .header-title {
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+    .connect-wallet-btn {
+      background-color: #444;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: background-color 0.2s;
+    }
+    .connect-wallet-btn:hover {
+      background-color: #666;
+    }
+
+    /* Container for the form */
     .container {
       max-width: 600px;
       margin: 2rem auto;
@@ -31,7 +61,14 @@
       padding: 2rem;
       box-shadow: 0 0 10px rgba(0,0,0,0.3);
     }
-    h1 { margin-bottom: 1rem; font-size: 1.75rem; text-align: center; color: #fff; }
+
+    h1 {
+      margin-bottom: 1rem;
+      font-size: 1.75rem;
+      text-align: center;
+      color: #fff;
+    }
+
     .back-btn {
       display: inline-block;
       background-color: #444;
@@ -43,20 +80,52 @@
       margin-bottom: 1rem;
       text-decoration: none;
     }
-    .back-btn:hover { background-color: #666; }
-    .form-group { margin-bottom: 1.25rem; }
-    label { display: block; font-weight: bold; margin-bottom: 0.5rem; color: #fff; }
-    input[type="file"], input[type="text"], textarea {
-      width: 100%; padding: 0.75rem;
+    .back-btn:hover {
+      background-color: #666;
+    }
+
+    /* Form group styling */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+
+    input[type="file"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
       border: 1px solid #555;
       border-radius: 4px;
-      background: #2a2c2d; color: #ddd; font-size: 1rem;
+      background: #2a2c2d;
+      color: #ddd;
+      font-size: 1rem;
     }
-    input[type="file"]:focus, input[type="text"]:focus, textarea:focus {
-      outline: none; border-color: #69a6f9;
+
+    input[type="file"]:focus,
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #69a6f9;
     }
-    textarea { resize: vertical; height: 80px; }
-    .optional-label { font-weight: normal; color: #888; font-size: 0.9rem; }
+
+    textarea {
+      resize: vertical;
+      height: 80px;
+    }
+
+    .optional-label {
+      font-weight: normal;
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    /* Submit Button */
     .submit-btn {
       display: block;
       width: 100%;
@@ -71,7 +140,11 @@
       transition: background-color 0.2s;
       margin-top: 1rem;
     }
-    .submit-btn:hover { background-color: #14486b; }
+    .submit-btn:hover {
+      background-color: #14486b;
+    }
+
+    /* Preview Image */
     .img-preview {
       display: block;
       width: 100px;
@@ -81,7 +154,15 @@
       border: 1px solid #444;
       border-radius: 4px;
     }
-    .note { margin-top: 1rem; font-size: 0.9rem; color: #aaa; }
+
+    /* Note / Footer text inside container */
+    .note {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+
+    /* FOOTER */
     footer {
       background-color: #111;
       color: #fff;
@@ -94,47 +175,112 @@
 <body>
 
 <header>
-  <h2>Stratton Labs - Create Token</h2>
+  <div class="header-title">Stratton Labs - Create Token</div>
+  <!-- Connect Wallet Button using Sui Wallet Standard -->
+  <button class="connect-wallet-btn" id="connectWalletBtn">Connect Wallet</button>
 </header>
 
 <div class="container">
   <a href="index.html" class="back-btn">&larr; Back to Main</a>
   <h1>Create Your Token</h1>
+
   <form id="createTokenForm">
+    <!-- 1) Token Logo (image upload) -->
     <div class="form-group">
       <label for="tokenLogo">Token Logo (image upload)</label>
-      <input type="file" id="tokenLogo" name="tokenLogo" accept="image/*" required />
+      <input 
+        type="file" 
+        id="tokenLogo" 
+        name="tokenLogo" 
+        accept="image/*" 
+        required 
+      />
       <img id="previewImg" class="img-preview" src="https://via.placeholder.com/100" alt="Preview" />
     </div>
+
+    <!-- 2) Token Name -->
     <div class="form-group">
       <label for="tokenName">Token Name</label>
-      <input type="text" id="tokenName" name="tokenName" placeholder="e.g. My Cool Token" required />
+      <input 
+        type="text" 
+        id="tokenName" 
+        name="tokenName" 
+        placeholder="e.g. My Cool Token" 
+        required 
+      />
     </div>
+
+    <!-- 3) Token Ticker -->
     <div class="form-group">
       <label for="tokenTicker">Token Ticker</label>
-      <input type="text" id="tokenTicker" name="tokenTicker" placeholder="e.g. MCT" required />
+      <input 
+        type="text" 
+        id="tokenTicker" 
+        name="tokenTicker" 
+        placeholder="e.g. MCT" 
+        required 
+      />
     </div>
+
+    <!-- 4) Short Description -->
     <div class="form-group">
       <label for="tokenDescription">Short Description</label>
-      <textarea id="tokenDescription" name="tokenDescription" placeholder="Briefly describe your token..." required></textarea>
+      <textarea 
+        id="tokenDescription" 
+        name="tokenDescription" 
+        placeholder="Briefly describe your token..." 
+        required
+      ></textarea>
     </div>
+
+    <!-- 5) Optional Website URL -->
     <div class="form-group">
-      <label for="websiteUrl">Website URL <span class="optional-label">(optional)</span></label>
-      <input type="text" id="websiteUrl" name="websiteUrl" placeholder="https://yoursite.com" />
+      <label for="websiteUrl">
+        Website URL <span class="optional-label">(optional)</span>
+      </label>
+      <input 
+        type="text" 
+        id="websiteUrl" 
+        name="websiteUrl" 
+        placeholder="https://yoursite.com" 
+      />
     </div>
+
+    <!-- 6) Optional Telegram URL -->
     <div class="form-group">
-      <label for="telegramUrl">Telegram URL <span class="optional-label">(optional)</span></label>
-      <input type="text" id="telegramUrl" name="telegramUrl" placeholder="https://t.me/YourTokenGroup" />
+      <label for="telegramUrl">
+        Telegram URL <span class="optional-label">(optional)</span>
+      </label>
+      <input 
+        type="text" 
+        id="telegramUrl" 
+        name="telegramUrl" 
+        placeholder="https://t.me/YourTokenGroup" 
+      />
     </div>
+
+    <!-- 7) Optional Twitter URL -->
     <div class="form-group">
-      <label for="twitterUrl">Twitter URL <span class="optional-label">(optional)</span></label>
-      <input type="text" id="twitterUrl" name="twitterUrl" placeholder="https://twitter.com/YourTokenHandle" />
+      <label for="twitterUrl">
+        Twitter URL <span class="optional-label">(optional)</span>
+      </label>
+      <input 
+        type="text" 
+        id="twitterUrl" 
+        name="twitterUrl" 
+        placeholder="https://twitter.com/YourTokenHandle" 
+      />
     </div>
+
+    <!-- Submit button -->
     <button type="submit" class="submit-btn">Submit Token Creation</button>
   </form>
+
   <div class="note">
     <p>
-      Note: This example converts the uploaded image to Base64. For production, consider uploading to IPFS or a server. If any required fields are empty, you cannot proceed.
+      Note: This example converts the uploaded image to Base64. For production,
+      consider uploading to IPFS or a server.  
+      If any required fields are empty, you cannot proceed.
     </p>
   </div>
 </div>
@@ -144,16 +290,52 @@
 </footer>
 
 <script>
+  // ======================
+  //  SUI WALLET STANDARD 
+  // ======================
+  document.getElementById('connectWalletBtn').addEventListener('click', async () => {
+    try {
+      // 1) Check if the global window.wallets array exists
+      if (!window.wallets || window.wallets.length === 0) {
+        alert("No Sui wallet found implementing the Wallet Standard. Please install a compatible wallet.");
+        return;
+      }
+      // 2) Choose the first wallet (for demonstration)
+      const chosenWallet = window.wallets[0];
+
+      // 3) Check if the wallet has the "standard:connect" feature
+      const standardConnect = chosenWallet.features["standard:connect"];
+      if (!standardConnect) {
+        alert("This wallet does not support 'standard:connect' feature.");
+        return;
+      }
+
+      // 4) Attempt to connect
+      const connectResult = await standardConnect.connect();
+      console.log("Wallet connected:", connectResult);
+      alert("Wallet connected!\n" + JSON.stringify(connectResult, null, 2));
+    } catch (error) {
+      console.error("Connection failed:", error);
+      alert("Failed to connect wallet: " + error.message);
+    }
+  });
+
+
+  // ================
+  // CREATE TOKEN LOGIC
+  // ================
   let tokenLogoBase64 = "";
   const fileInput = document.getElementById("tokenLogo");
   const previewImg = document.getElementById("previewImg");
+
   fileInput.addEventListener("change", (event) => {
     const file = event.target.files[0];
     if (!file) return;
+
     const reader = new FileReader();
     reader.onload = function(e) {
-      tokenLogoBase64 = e.target.result;
-      previewImg.src = tokenLogoBase64;
+      tokenLogoBase64 = e.target.result; 
+      previewImg.src = tokenLogoBase64;  
     };
     reader.readAsDataURL(file);
   });
@@ -161,9 +343,11 @@
   const form = document.getElementById('createTokenForm');
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+
     const tokenName = document.getElementById('tokenName').value.trim();
     const tokenTicker = document.getElementById('tokenTicker').value.trim();
     const tokenDescription = document.getElementById('tokenDescription').value.trim();
+
     if (!tokenName || !tokenTicker || !tokenDescription || !tokenLogoBase64) {
       alert("Please fill out all required fields.");
       return;
@@ -171,6 +355,8 @@
     const websiteUrl = document.getElementById('websiteUrl').value.trim();
     const telegramUrl = document.getElementById('telegramUrl').value.trim();
     const twitterUrl = document.getElementById('twitterUrl').value.trim();
+
+    // 1) Store in localStorage so index can display it
     const newToken = {
       logo: tokenLogoBase64,
       name: tokenName,
@@ -180,9 +366,12 @@
       telegramUrl,
       twitterUrl
     };
+
     const existingTokens = JSON.parse(localStorage.getItem('myTokens')) || [];
     existingTokens.push(newToken);
     localStorage.setItem('myTokens', JSON.stringify(existingTokens));
+
+    // 2) Build query params for token-page display
     const queryParams = new URLSearchParams({
       tokenLogo: tokenLogoBase64,
       tokenName,
@@ -192,6 +381,8 @@
       telegramUrl,
       twitterUrl
     });
+
+    // 3) Redirect to token-page.html
     window.location.href = `token-page.html?${queryParams.toString()}`;
   });
 </script>
